@@ -2,7 +2,7 @@
 
 In this directory, there are two scripts available for student testing convenience.
 
-### [test_my_name.sh](https://github.com/CSE330-OS/GTA-CSE330-Fall2024/blob/main/Project2/testing/test_my_name.sh)
+### [test_my_name.sh](https://github.com/visa-lab/CSE330-OS/blob/project-2/test_my_name.sh)
 
 This script can be used to test your kernel module. It will do the following:
 
@@ -31,7 +31,7 @@ Final Score (my_name): 50 / 50
 Note: This does not show complete grade points for the project . Please refer to the project document for more details.
 
 
-### [test_zip_contents.sh](https://github.com/CSE330-OS/GTA-CSE330-Fall2024/blob/main/Project2/testing/test_zip_contents.sh)
+### [test_zip_contents.sh](https://github.com/visa-lab/CSE330-OS/blob/project-2/test_zip_contents.sh)
 
 This script can be used to ensure your final submission adheres to the directory structure specified in the project document. It will do the following:
 
