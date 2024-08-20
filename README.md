@@ -2,7 +2,7 @@
 
 In this directory, there is a single script available for student testing convenience.
 
-### test_zip_contents.sh
+### [test_zip_contents.sh](https://github.com/visa-lab/CSE330-OS/blob/project-1/test_zip_contents.sh)
 
 This script can be used to ensure the final submission adheres to the expected format specified in the project document. It will do the following:
 
