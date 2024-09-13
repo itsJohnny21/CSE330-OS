@@ -65,3 +65,9 @@ Note, the autograder script will need to deduct points from the points given in 
 ### [utils.sh](https://github.com/CSE330-OS/GTA-CSE330-Fall2024/blob/main/Project2/testing/utils.sh)
 
 This script is not meant to be run directly, and only contains code that is used in both scripts mentioned above.
+
+### Note
+
+- Please do not make changes in provided test code to pass the test cases.
+- You can use print statements in case you want to debug and understand the logic of the test code (the diagrams may also be useful).
+- Please get in touch with the TAs if you face issues in using the test scripts.
