@@ -2,7 +2,7 @@
 
 In this directory, there are two scripts available for student testing convenience.
 
-### [test_module.sh](https://github.com/CSE330-OS/GTA-CSE330-Fall2024/blob/main/Project2/testing/test_module.sh)
+### [test_module.sh](https://github.com/visa-lab/CSE330-OS/blob/project-2/test_module.sh)
 
 This script can be used to test the kernel module. It will do the following after unzipping the provided zip file:
 
@@ -30,7 +30,7 @@ Unzipping to "/path/to/zip/file.zip"
 [Total Score]: 50 out of 50
 ```
 
-### [test_syscall.sh](https://github.com/CSE330-OS/GTA-CSE330-Fall2024/blob/main/Project2/testing/test_syscall.sh)
+### [test_syscall.sh](https://github.com/visa-lab/CSE330-OS/blob/project-2/test_syscall.sh)
 
 This script can be used to test the syscall. It will do the following after unzipping the provided zip file:
 
