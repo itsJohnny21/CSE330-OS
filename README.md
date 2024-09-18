@@ -76,6 +76,34 @@ NOTE: This script does not check the content of your screenshot.
 
 Note, the autograder script will need to deduct points from the points given in this script if the screenshot content is incorrect.
 
+### [test_resubmission.sh](https://github.com/visa-lab/CSE330-OS/blob/project-2/test_resubmission.sh)
+
+This script can be used to test the syscall. It will do the following after unzipping the provided zip file:
+
+![image](https://github.com/user-attachments/assets/925cd6fc-fbdb-45af-9fe4-49707b82faf8)
+
+#### Usage and expected output:
+
+Usage:
+```bash
+./test_resubmission.sh /path/to/zip/file.zip
+```
+
+Expected Output:
+```
+NOTE: This script is only meant for testing P1 resubmission
+Unzipping to "unzip_1726685441"
+[log]: Look for Project1 directory
+[log]: - directory /home/vboxuser/git/CSE330-OS/unzip_1726685441/Project1 found
+[log]: Look for uname.png/uname.jpg
+[log]: - file /home/vboxuser/git/CSE330-OS/unzip_1726685441/Project1/uname* found
+[log]: Look for lsb_release.png/lsb_release.jpg
+[log]: - file /home/vboxuser/git/CSE330-OS/unzip_1726685441/Project1/lsb_release* found
+[P1 Resubmit]: Passed
+```
+
+Note, you ONLY need to run this script if you are planning to have your Project 1 regraded. If you are satisfied with your Project 1 grade, you do not need to worry about this script OR include a Project1 directory in your submission.
+
 ### [utils.sh](https://github.com/CSE330-OS/GTA-CSE330-Fall2024/blob/main/Project2/testing/utils.sh)
 
 This script is not meant to be run directly, and only contains code that is used in both scripts mentioned above.
