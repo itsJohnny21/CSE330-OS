@@ -17,15 +17,21 @@ Usage:
 
 Expected Output:
 ```
-Unzipping to "/path/to/zip/file.zip"
+Unzipping to "unzip_1726647889"
 [log]: Look for kernel_module directory
+[log]: - directory /home/vboxuser/git/CSE330-OS/unzip_1726647889/kernel_module found
 [log]: Look for Makefile
+[log]: - file /home/vboxuser/git/CSE330-OS/unzip_1726647889/kernel_module/Makefile found
 [log]: Look for source file (my_name.c)
+[log]: - file /home/vboxuser/git/CSE330-OS/unzip_1726647889/kernel_module/my_name.c found
 [log]: Compile the kernel module
+[log]: - Compiled successfully
 [log]: Load the kernel module
-[sudo] password for vboxuser: 
+[log]: - Loaded successfully
 [log]: Check dmesg output
+[log]: - Output is correct
 [log]: Unload the kernel module
+[log]: - Kernel module unloaded sucessfully
 [my_name]: Passed with 50 out of 50
 [Total Score]: 50 out of 50
 ```
@@ -45,14 +51,22 @@ Usage:
 
 Expected Output:
 ```
-Unzipping to "/tmp/demo/demo.zip"
+Unzipping to "unzip_1726647980"
 [log]: Look for kernel_syscall directory
+[log]: - directory /home/vboxuser/git/CSE330-OS/unzip_1726647980/kernel_syscall found
 [log]: Look for Makefile
+[log]: - file /home/vboxuser/git/CSE330-OS/unzip_1726647980/kernel_syscall/Makefile found
 [log]: Look for source file (my_syscall.c)
+[log]: - file /home/vboxuser/git/CSE330-OS/unzip_1726647980/kernel_syscall/my_syscall.c found
 [log]: Look for userspace directory
+[log]: - directory /home/vboxuser/git/CSE330-OS/unzip_1726647980/userspace found
 [log]: Look for source file (syscall_in_userspace_test.c)
+[log]: - file /home/vboxuser/git/CSE330-OS/unzip_1726647980/userspace/syscall_in_userspace_test.c found
 [log]: Look for screenshots directory
+[log]: - directory /home/vboxuser/git/CSE330-OS/unzip_1726647980/screenshots found
 [log]: Look for syscall_output screenshot
+[log]: - file /home/vboxuser/git/CSE330-OS/unzip_1726647980/screenshots/syscall_output.* found
+[log]: - Screenshot found
 [my_syscall]: Passed with 50 out of 50
 [Total Score]: 50 out of 50 (this is NOT your final grade)
 NOTE: This script does not check the content of your screenshot.

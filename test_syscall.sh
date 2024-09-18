@@ -16,12 +16,12 @@ run_test ()
     mkdir -p ${unzip_dir}
     pushd ${unzip_dir} 1>/dev/null
     unzip ${zip_file} 1>/dev/null
-    echo "Unzipping to \"${zip_file}\""
+    echo "Unzipping to \"${unzip_dir}\""
 
     if check_system_call; then
-        echo "[my_syscall]: Passed with ${SYSCALL_PTS} out of ${SYSCALL_TOTAL}"
+        echo -e "[my_syscall]: Passed with ${SYSCALL_PTS} out of ${SYSCALL_TOTAL}"
     else
-        echo "[my_syscall]: Failed with ${SYSCALL_PTS} out of ${SYSCALL_TOTAL} because \"${SYSCALL_ERR}\""
+        echo -e "[my_syscall]: Failed with ${SYSCALL_PTS} out of ${SYSCALL_TOTAL} because:${SYSCALL_ERR}"
     fi
 
     let FINAL_TOTAL=SYSCALL_TOTAL

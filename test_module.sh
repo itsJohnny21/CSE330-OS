@@ -16,12 +16,12 @@ run_test ()
     mkdir -p ${unzip_dir}
     pushd ${unzip_dir} 1>/dev/null
     unzip ${zip_file} 1>/dev/null
-    echo "Unzipping to \"${zip_file}\""
+    echo "Unzipping to \"${unzip_dir}\""
 
     if check_kernel_module; then
-        echo "[my_name]: Passed with ${KERNEL_MODULE_PTS} out of ${KERNEL_MODULE_TOTAL}"
+        echo -e "[my_name]: Passed with ${KERNEL_MODULE_PTS} out of ${KERNEL_MODULE_TOTAL}"
     else
-        echo "[my_name]: Failed with ${KERNEL_MODULE_PTS} out of ${KERNEL_MODULE_TOTAL} because \"${KERNEL_MODULE_ERR}\"."
+        echo -e "[my_name]: Failed with ${KERNEL_MODULE_PTS} out of ${KERNEL_MODULE_TOTAL} because:${KERNEL_MODULE_ERR}."
     fi
 
     let FINAL_TOTAL=KERNEL_MODULE_TOTAL
