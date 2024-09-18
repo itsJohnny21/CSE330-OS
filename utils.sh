@@ -12,11 +12,14 @@ KERNEL_MODULE_MSG=""
 KERNEL_MODULE_PTS=0
 KERNEL_MODULE_TOTAL=50
 
-# System call correcctness
+# System call correctness
 SYSCALL_ERR=""
 SYSCALL_MSG=""
 SYSCALL_PTS=0
 SYSCALL_TOTAL=50
+
+# Resubmission correctness
+RESUBMIT_ERR=""
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ #
 
@@ -238,4 +241,28 @@ check_system_call ()
 
     let SYSCALL_PTS=SYSCALL_PTS+50
     return 0
+}
+
+check_resubmission ()
+{
+    # Step 1: Check directory - stop if failed
+    echo "[log]: Look for Project1 directory"
+    if ! check_dir "Project1"; then
+        RESUBMIT_ERR="${RESUBMIT_ERR}\n - Failed to find Project1 directory"
+        return 1
+    fi
+
+    # Step 2: Check uname.png/uname.jpg - stop if failed
+    echo "[log]: Look for uname.png/uname.jpg"
+    if ! check_file "Project1/uname*"; then
+        RESUBMIT_ERR="${RESUBMIT_ERR}\n - Failed to find uname screenshot"
+        return 1
+    fi
+
+    # Step 3: Check lsb_release.png/lsb_release.jpg - stop if failed
+    echo "[log]: Look for lsb_release.png/lsb_release.jpg"
+    if ! check_file "Project1/lsb_release*"; then
+        RESUBMIT_ERR="${RESUBMIT_ERR}\n - Failed to find lsb_release screenshot"
+        return 1
+    fi
 }
