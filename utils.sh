@@ -6,20 +6,11 @@ TOTAL_DIRS=0
 EXTRA_FILES=""
 
 # Kernel module correctness
-KERNEL_MODULE_NAME="my_name"
+KERNEL_MODULE_NAME="producer_consumer"
 KERNEL_MODULE_ERR=""
 KERNEL_MODULE_MSG=""
 KERNEL_MODULE_PTS=0
-KERNEL_MODULE_TOTAL=50
-
-# System call correctness
-SYSCALL_ERR=""
-SYSCALL_MSG=""
-SYSCALL_PTS=0
-SYSCALL_TOTAL=50
-
-# Resubmission correctness
-RESUBMIT_ERR=""
+KERNEL_MODULE_TOTAL=20
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ #
 
@@ -53,56 +44,43 @@ check_dir ()
 
 compile_module ()
 {
-    pushd "kernel_module" 1>/dev/null
     make_err=$(make 2>&1 1>/dev/null)
 
     if [ $? -ne 0 ] ; then
-        KERNEL_MODULE_ERR="${KERNEL_MODULE_ERR}\n - (-50 points) Failed to compile your kernel module: ${make_err}"
+        KERNEL_MODULE_ERR="${KERNEL_MODULE_ERR}\n - (-20 points) Failed to compile your kernel module: ${make_err}"
         popd 1>/dev/null
         return 1
     fi
 
     echo "[log]: - Compiled successfully"
-    popd 1>/dev/null
     return 0
 }
 
 load_module_with_params ()
 {
-    pushd "kernel_module" 1>/dev/null
+    local prod=$1
+    local cons=$2
+    local size=$3
 
     # Check to make sure kernel object exists
     if [ ! -e "${KERNEL_MODULE_NAME}.ko" ]; then
-        KERNEL_MODULE_ERR="${KERNEL_MODULE_ERR}\n - (-20 points) Failed to find your kernel object ${KERNEL_MODULE_NAME}.ko"
+        KERNEL_MODULE_ERR="${KERNEL_MODULE_ERR}\n - (-2 points) Failed to find your kernel object ${KERNEL_MODULE_NAME}.ko"
         popd 1>/dev/null
         return 1
     fi
 
     # Insert kernel module - check exit code
     sudo dmesg -C
-    sudo insmod "${KERNEL_MODULE_NAME}.ko" charParameter="Fall" intParameter=2024
+    sudo insmod "${KERNEL_MODULE_NAME}.ko" prod=${prod} cons=${cons} size=${size}
     if [ $? -ne 0 ]; then
-        KERNEL_MODULE_ERR="${KERNEL_MODULE_ERR}\n - (-20 points) Insmod exitted with non-zero return code"
+        KERNEL_MODULE_ERR="${KERNEL_MODULE_ERR}\n - (-2 points) Insmod exitted with non-zero return code"
         popd 1>/dev/null
         return 1
     fi
 
     # Check lsmod to make sure module is loaded
     if ! lsmod | grep -q "^${KERNEL_MODULE_NAME}"; then
-        KERNEL_MODULE_ERR="${KERNEL_MODULE_ERR}\n - (-20 points) Kernel module does not appear in lsmod"
-        return 1
-    fi
-
-    popd 1>/dev/null
-    return 0
-}
-
-check_module_output ()
-{
-    local output=`sudo dmesg`
-    if ! echo ${output} | grep -E "$1" 1>/dev/null; then
-        KERNEL_MODULE_ERR="${KERNEL_MODULE_ERR}\n - (-20 points) Incorrect output: ${output}"
-        echo "[log]: - Output incorrect: ${output}"
+        KERNEL_MODULE_ERR="${KERNEL_MODULE_ERR}\n - (-2 points) Kernel module does not appear in lsmod"
         return 1
     fi
 
@@ -115,7 +93,7 @@ unload_module ()
 
     # Checking for successful module removal
     if lsmod | grep -q "^${KERNEL_MODULE_NAME}"; then
-        KERNEL_MODULE_ERR="${KERNEL_MODULE_ERR}\n - (-10 points) Failed to unload kernel module"
+        KERNEL_MODULE_ERR="${KERNEL_MODULE_ERR}\n - (-2 points) Failed to unload kernel module"
         echo "[log]: - Failed to unload kernel module"
         return 1
     fi
@@ -125,144 +103,237 @@ unload_module ()
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ #
 
+check_threads ()
+{
+    local prod=$1
+    local cons=$2
+
+    # Check for producers
+    local count=$(sudo ps aux | grep "Producer-" | wc -l)
+    let count=count-1
+
+    if [ "${count}" -ne "${prod}" ]; then
+        KERNEL_MODULE_ERR="${KERNEL_MODULE_ERR}\n - (-4 points) Found ${count} producer threads, expected ${prod}"
+        return 1
+    fi
+
+    # Check for consumers
+    local count=$(sudo ps aux | grep "Consumer-" | wc -l)
+    let count=count-1
+
+    if [ "${count}" -ne "${cons}" ]; then
+        KERNEL_MODULE_ERR="${KERNEL_MODULE_ERR}\n - (-4 points) Found ${count} consumer threads, expected ${cons}"
+        return 1
+    fi
+
+    # All is good
+    return 0
+}
+
+check_output ()
+{
+    # We use head 1000 here to prevent the rate at which `dmesg` is receiving output from your kernel
+    # module from preventing the file redirection from ever seeing EOF, this way it is garunteed to
+    # finish. We do not need all output to validate the correctness, the first 1000 lines is ok.
+    local log_filename="output_$(date +%s).log"
+    sudo dmesg | head -n 1000 > "${log_filename}"
+
+    local prod=$1
+    local cons=$2
+    local size=$3
+
+    # Check 1: If there is no space to produce items,
+    # there will never be any output.
+    if [ "${size}" -eq 0 ]; then
+        echo "[info]: The size is zero so we will check to make sure no items are produced or consumed"
+
+        # Check for produced items
+        line_count=$(grep "An item has been produced" "${log_filename}" | wc -l)
+        if [ "${line_count}" -ne 0 ]; then
+            KERNEL_MODULE_ERR="${KERNEL_MODULE_ERR}\n - (-8 points) Size is zero, yet items have been produced"
+            rm ${log_filename}
+            return 1
+        else
+            rm ${log_filename}
+            return 0
+        fi
+
+        # Check for consumed items
+        line_count=$(grep "An item has been consumed" "${log_filename}" | wc -l)
+        if [ "${line_count}" -ne 0 ]; then
+            KERNEL_MODULE_ERR="${KERNEL_MODULE_ERR}\n - (-8 points) Size is zero, yet items have been consumed"
+            rm ${log_filename}
+            return 1
+        else
+            rm ${log_filename}
+            return 0
+        fi
+    fi
+
+    # Check 2: No producers means no output because no items will ever
+    # be produced (or consumed, since there is nothing to consume)
+    if [ "${prod}" -eq 0 ]; then
+        echo "[info]: There are no producers, so we will make sure no items are produced or consumed"
+
+        # Checking for any output at all - if we see any the solution is wrong
+        line_count=$(grep -E "An item has been produced|An item has been consumed" "${log_filename}" | wc -l)
+        if [ "${line_count}" -ne 0 ]; then
+            KERNEL_MODULE_ERR="${KERNEL_MODULE_ERR}\n - (-8 points) There are no producers, yet items have been produced"
+            rm ${log_filename}
+            return 1
+        else
+            rm ${log_filename}
+            return 0
+        fi
+    fi
+
+    # Check 3: If there are producers, and no consumers, then the
+    # total number of items produced is bound by the size
+    if [ "${cons}" -eq 0 ]; then
+        echo "[info]: There are no consumers, so we will make sure items are produced but not consumed"
+
+        # Check for items produced - should equal the size
+        line_count=$(grep "An item has been produced" "${log_filename}" | wc -l)
+        if [ "${line_count}" -ne ${size} ]; then
+            KERNEL_MODULE_ERR="${KERNEL_MODULE_ERR}\n - (-8 points) There are no consumers, yet the producers have produced more than size"
+            rm ${log_filename}
+            return 1
+        else
+            rm ${log_filename}
+            return 0
+        fi
+
+        # Check for items consumed - should equal zero
+        line_count=$(grep "An item has been consumed" "${log_filename}" | wc -l)
+        if [ "${line_count}" -ne ${size} ]; then
+            KERNEL_MODULE_ERR="${KERNEL_MODULE_ERR}\n - (-8 points) There are no consumers, yet items have been consumed"
+            rm ${log_filename}
+            return 1
+        else
+            rm ${log_filename}
+            return 0
+        fi
+    fi
+
+    # Check 4: If there are producers, and consumers, and there is
+    # a non-zero size, there should be an ongoing cycle of production
+    # and consumption. This checks to make sure that a reasonable
+    # amount of production and consumption has occured.
+    line_count=$(grep -E "An item has been produced|An item has been consumed" "${log_filename}" | wc -l)
+    if [ "${line_count}" -le "${size}" ]; then
+        KERNEL_MODULE_ERR="${KERNEL_MODULE_ERR}\n - (-8 points) The producers are not producing enough"
+        rm ${log_filename}
+        return 1
+    fi
+
+    rm ${log_filename}
+    return 0
+}
+
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ #
+
 check_kernel_module ()
 {
     local STATUS=0
+    local prod=$1
+    local cons=$2
+    local size=$3
 
-    # Step 1: Check directory - stop if failed
-    echo "[log]: Look for kernel_module directory"
-    if ! check_dir "kernel_module"; then
-        KERNEL_MODULE_ERR="${KERNEL_MODULE_ERR}\n - (-50 points) Failed to find kernel_module directory"
-        return 1
-    fi
+    echo "Testing your kernel module with ${prod} producers, ${cons} consumers, and a size of ${size}:"
 
-    # Step 2: Check Makefile - stop if failed
+    # Step 1: Check Makefile - stop if failed
     echo "[log]: Look for Makefile"
-    if ! check_file "kernel_module/Makefile"; then
-        KERNEL_MODULE_ERR="${KERNEL_MODULE_ERR}\n - (-50 points) Failed to find your Makefile"
+    if ! check_file "Makefile"; then
+        KERNEL_MODULE_ERR="${KERNEL_MODULE_ERR}\n - (-20 points) Failed to find your Makefile"
         return 1
     fi
 
-    # Step 3: Check my_name.c - stop if failed
+    # Step 2: Check my_name.c - stop if failed
     echo "[log]: Look for source file (my_name.c)"
-    if ! check_file "kernel_module/my_name.c"; then
-        KERNEL_MODULE_ERR="${KERNEL_MODULE_ERR}\n - (-50 points) Failed to find your my_name.c source file"
+    if ! check_file "producer_consumer.c"; then
+        KERNEL_MODULE_ERR="${KERNEL_MODULE_ERR}\n - (-20 points) Failed to find your producer_consumer.c source file"
         return 1
     fi
 
-    # Step 4: Compile the kernel module - stop if failed
+    # Step 3: Compile the kernel module - stop if failed
     echo "[log]: Compile the kernel module"
     if ! compile_module; then
         return 1
     fi
 
-    # Step 5: Load the kernel module - stop if failed
+    # Step 4: Load the kernel module - stop if failed
     echo "[log]: Load the kernel module"
-    if ! load_module_with_params; then
+    if ! load_module_with_params ${prod} ${cons} ${size}; then
         return 1
     else
         echo "[log]: - Loaded successfully"
-        let KERNEL_MODULE_PTS=KERNEL_MODULE_PTS+20
+        let KERNEL_MODULE_PTS=KERNEL_MODULE_PTS+4
     fi
+
+    # Step 5: Check the thread count
+    if ! check_threads ${prod} ${cons}; then
+        let STATUS=1
+    else
+        echo "[log]: - Found all expected threads"
+        let KERNEL_MODULE_PTS=KERNEL_MODULE_PTS+4
+    fi
+
+    # We sleep here to give the threads time to produce/consume. We need to have
+    # something in dmesg to look for to make sure the behavior is as expected.
+    sleep 0.1
 
     # Step 6: Check output
-    echo "[log]: Check dmesg output"
-    if ! check_module_output "Hello, I am .*, a student of CSE330 Fall 2024"; then
-        let STATUS=1
+    echo "[log]: Checking output"
+    if ! check_output $prod $cons $size; then
+        return 1
     else
         echo "[log]: - Output is correct"
-        let KERNEL_MODULE_PTS=KERNEL_MODULE_PTS+20
+        let KERNEL_MODULE_PTS=KERNEL_MODULE_PTS+4
     fi
 
-    # Step 7: Unload module
+    # Step 7: Unload module - stop if failed
     echo "[log]: Unload the kernel module"
-    if ! unload_module; then
-        let STATUS=1
+    if ! unload_module ${log_filename}; then
+        return 1
     else
         echo "[log]: - Kernel module unloaded sucessfully"
-        let KERNEL_MODULE_PTS=KERNEL_MODULE_PTS+10
+        let KERNEL_MODULE_PTS=KERNEL_MODULE_PTS+4
+    fi
+
+    # Step 8: Make sure all threads are stopped
+    echo "[log]: Checking to make sure kthreads are terminated"
+    if ! check_threads 0 0; then
+        let STATUS=1
+    else
+        echo "[log]: - All threads have been stopped"
+        let KERNEL_MODULE_PTS=KERNEL_MODULE_PTS+4
     fi
 
     return $STATUS
 }
 
-check_system_call ()
+check_zip_content ()
 {
-    # Step 1: Check directory - stop if failed
-    echo "[log]: Look for kernel_syscall directory"
-    if ! check_dir "kernel_syscall"; then
-        SYSCALL_ERR="${SYSCALL_ERR}\n - (-50 points) Failed to find kernel_syscall directory"
+    # Step 1: Check for `source_code` directory - stop if failed
+    echo "[log]: Look for source file (my_name.c)"
+    if ! check_file "source_code"; then
+        KERNEL_MODULE_ERR="${KERNEL_MODULE_ERR}"
         return 1
     fi
 
     # Step 2: Check Makefile - stop if failed
     echo "[log]: Look for Makefile"
-    if ! check_file "kernel_syscall/Makefile"; then
-        SYSCALL_ERR="${SYSCALL_ERR}\n - (-50 points) Failed to find your Makefile"
+    if ! check_file "source_code/Makefile"; then
+        KERNEL_MODULE_ERR="${KERNEL_MODULE_ERR}"
         return 1
     fi
 
-    # Step 3: Check my_syscall.c - stop if failed
-    echo "[log]: Look for source file (my_syscall.c)"
-    if ! check_file "kernel_syscall/my_syscall.c"; then
-        SYSCALL_ERR="${SYSCALL_ERR}\n - (-50 points) Failed to find your my_syscall.c source file"
+    # Step 3: Check my_name.c - stop if failed
+    echo "[log]: Look for source file (my_name.c)"
+    if ! check_file "source_code/producer_consumer.c"; then
+        KERNEL_MODULE_ERR="${KERNEL_MODULE_ERR}"
         return 1
     fi
 
-    # Step 4: Check directory - stop if failed
-    echo "[log]: Look for userspace directory"
-    if ! check_dir "userspace"; then
-        SYSCALL_ERR="${SYSCALL_ERR}\n - (-50 points) Failed to find userspace directory"
-        return 1
-    fi
-
-    # Step 5: Check syscall_in_userspace_test.c - stop if failed
-    echo "[log]: Look for source file (syscall_in_userspace_test.c)"
-    if ! check_file "userspace/syscall_in_userspace_test.c"; then
-        SYSCALL_ERR="${SYSCALL_ERR}\n - (-50 points) Failed to find your userspace code"
-        return 1
-    fi
-
-    # Step 6: Check directory - stop if failed
-    echo "[log]: Look for screenshots directory"
-    if ! check_dir "screenshots"; then
-        SYSCALL_ERR="${SYSCALL_ERR}\n - (-50 points) Failed to find screenshots directory"
-        return 1
-    fi
-
-    # Step 7: Check syscall_output.png - stop if failed
-    echo "[log]: Look for syscall_output screenshot"
-    if ! check_file "screenshots/syscall_output.*"; then
-        SYSCALL_ERR="${SYSCALL_ERR}\n - (-50 points) Failed to find your syscall_output screenshot"
-        return 1
-    else
-        echo "[log]: - Screenshot found"
-    fi
-
-    let SYSCALL_PTS=SYSCALL_PTS+50
     return 0
-}
-
-check_resubmission ()
-{
-    # Step 1: Check directory - stop if failed
-    echo "[log]: Look for Project1 directory"
-    if ! check_dir "Project1"; then
-        RESUBMIT_ERR="${RESUBMIT_ERR}\n - Failed to find Project1 directory"
-        return 1
-    fi
-
-    # Step 2: Check uname.png/uname.jpg - stop if failed
-    echo "[log]: Look for uname.png/uname.jpg"
-    if ! check_file "Project1/uname*"; then
-        RESUBMIT_ERR="${RESUBMIT_ERR}\n - Failed to find uname screenshot"
-        return 1
-    fi
-
-    # Step 3: Check lsb_release.png/lsb_release.jpg - stop if failed
-    echo "[log]: Look for lsb_release.png/lsb_release.jpg"
-    if ! check_file "Project1/lsb_release*"; then
-        RESUBMIT_ERR="${RESUBMIT_ERR}\n - Failed to find lsb_release screenshot"
-        return 1
-    fi
 }
