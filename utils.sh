@@ -248,8 +248,8 @@ check_kernel_module ()
         return 1
     fi
 
-    # Step 2: Check my_name.c - stop if failed
-    echo "[log]: Look for source file (my_name.c)"
+    # Step 2: Check producer_consumer.c - stop if failed
+    echo "[log]: Look for source file (producer_consumer.c)"
     if ! check_file "producer_consumer.c"; then
         KERNEL_MODULE_ERR="${KERNEL_MODULE_ERR}\n - (-20 points) Failed to find your producer_consumer.c source file"
         return 1
@@ -315,23 +315,23 @@ check_kernel_module ()
 check_zip_content ()
 {
     # Step 1: Check for `source_code` directory - stop if failed
-    echo "[log]: Look for source file (my_name.c)"
-    if ! check_file "source_code"; then
-        KERNEL_MODULE_ERR="${KERNEL_MODULE_ERR}"
+    echo "[log]: Look for directory (source_code)"
+    if ! check_dir "source_code"; then
+        KERNEL_MODULE_ERR="${KERNEL_MODULE_ERR} directory source_code not found"
         return 1
     fi
 
     # Step 2: Check Makefile - stop if failed
     echo "[log]: Look for Makefile"
     if ! check_file "source_code/Makefile"; then
-        KERNEL_MODULE_ERR="${KERNEL_MODULE_ERR}"
+        KERNEL_MODULE_ERR="${KERNEL_MODULE_ERR} file Makefile not found"
         return 1
     fi
 
-    # Step 3: Check my_name.c - stop if failed
-    echo "[log]: Look for source file (my_name.c)"
+    # Step 3: Check producer_consumer.c - stop if failed
+    echo "[log]: Look for source file (producer_consumer.c)"
     if ! check_file "source_code/producer_consumer.c"; then
-        KERNEL_MODULE_ERR="${KERNEL_MODULE_ERR}"
+        KERNEL_MODULE_ERR="${KERNEL_MODULE_ERR} file "
         return 1
     fi
 
