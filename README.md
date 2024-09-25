@@ -2,7 +2,7 @@
 
 In this directory, there are two scripts available for student testing convenience.
 
-## test_module.sh
+## [test_module.sh](https://github.com/visa-lab/CSE330-OS/blob/project-3/test_module.sh)
 
 This script can be used to test the kernel module. It will do the following when provided the directory to your source code and arguments to pass as the values for your module parameters:
  - Note, the reason we have it take a directory to your code rather than a zip file is to ease the testing process during development by not requiring you to create a zip file just to test your code. This script is to be used specifically during development.
@@ -40,7 +40,7 @@ Testing your kernel module with 5 producers, 5 consumers, and a size of 5:
 [Total Score]: 20 out of 20
 ```
 
-## test_zip_contents.sh
+## [test_zip_contents.sh](https://github.com/visa-lab/CSE330-OS/blob/project-3/test_zip_contents.sh)
 
 This script is to be used to ensure the final submission adheres to the expected format specified in the project codument. It will do the following:
 
@@ -66,7 +66,7 @@ Expected Output:
 [test_zip_contents]: Passed
 ```
 
-## utils.sh
+## [utils.sh](https://github.com/visa-lab/CSE330-OS/blob/project-3/utils.sh)
 
 This script is not meant to be run directly, and only contains code that is used across both scripts mentioned above.
 - Please do not make any changes in provided test case code to pass the test cases.
