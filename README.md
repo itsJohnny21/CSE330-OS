@@ -22,12 +22,11 @@ Expected Output (tested with 5 producers, 5 consumers, and a size of 5):
 Testing your kernel module with 5 producers, 5 consumers, and a size of 5:
 [log]: Look for Makefile
 [log]: - file /home/vboxuser/Project3/Makefile found
-[log]: Look for source file (my_name.c)
+[log]: Look for source file (producer_consumer.c)
 [log]: - file /home/vboxuser/Project3/producer_consumer.c found
 [log]: Compile the kernel module
 [log]: - Compiled successfully
 [log]: Load the kernel module
-[sudo] password for vboxuser: 
 [log]: - Loaded successfully
 [log]: - Found all expected threads
 [log]: Checking output
@@ -57,12 +56,12 @@ Usage:
 
 Expected Output:
 ```
-[log]: Look for source file (my_name.c)
-[log]: - file /home/vboxuser/git/GTA-CSE330-Fall2024/Project3/testing/unzip_1727029538/source_code found
+[log]: Look for directory (source_code)
+[log]: - directory /home/vboxuser/git/CSE330-OS/unzip_1727299910/source_code found
 [log]: Look for Makefile
-[log]: - file /home/vboxuser/git/GTA-CSE330-Fall2024/Project3/testing/unzip_1727029538/source_code/Makefile found
-[log]: Look for source file (my_name.c)
-[log]: - file /home/vboxuser/git/GTA-CSE330-Fall2024/Project3/testing/unzip_1727029538/source_code/producer_consumer.c found
+[log]: - file /home/vboxuser/git/CSE330-OS/unzip_1727299910/source_code/Makefile found
+[log]: Look for source file (producer_consumer.c)
+[log]: - file /home/vboxuser/git/CSE330-OS/unzip_1727299910/source_code/producer_consumer.c found
 [test_zip_contents]: Passed
 ```
 
