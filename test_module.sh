@@ -15,6 +15,11 @@ run_test ()
     local size=$4
 
     local project_path=$(realpath "$1")
+    if [ ! -d ${project_path} ]; then
+        echo "WARNING: ${project_path} is not a proper project directory."
+        echo "Please provide the correct path to your project directory, i.e. the directory containing your kernel module source code and Makefile."
+        exit 1
+    fi
     pushd ${project_path} 1>/dev/null
 
     if check_kernel_module $prod $cons $size; then
