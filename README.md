@@ -2,76 +2,114 @@
 
 In this directory, there are two scripts available for student testing convenience.
 
-### [test_my_name.sh](https://github.com/visa-lab/CSE330-OS/blob/project-2/test_my_name.sh)
+### [test_module.sh](https://github.com/visa-lab/CSE330-OS/blob/project-2/test_module.sh)
 
-This script can be used to test your kernel module. It will do the following:
+This script can be used to test the kernel module. It will do the following after unzipping the provided zip file:
 
-1. Compile your kernel module
-2. Run `insmod my_name.ko` on the resulting kernel object, providing arguments for `intParameter` and `charParameter`
-3. Examine the output by running `dmesg` and looking for the expected output
-4. Remove your kernel module and ensure the module unloaded gracefully
-
-Once the script is done running, it will inform you of your total point count out of 50 for the `my_name` section of the rubric.
+![image](https://github.com/user-attachments/assets/19985d13-289a-4071-837e-7aee92abb216)
 
 #### Usage and expected output:
 
 Usage:
 ```bash
-./test_my_name.sh <path to directory containing my_name.c and Makefile>
+./test_module.sh /path/to/zip/file.zip
 ```
 
 Expected Output:
 ```
-Loading kernel module with module params: charParameter="Fall" intParameter=2024
- - expected dmesg output: [ 2377.841074] Hello, I am Linus Torvalds, a student of CSE330 Fall 2024.
-Removing kernel module
-Final Score (my_name): 50 / 50
+Unzipping to "unzip_1726647889"
+[log]: Look for kernel_module directory
+[log]: - directory /home/vboxuser/git/CSE330-OS/unzip_1726647889/kernel_module found
+[log]: Look for Makefile
+[log]: - file /home/vboxuser/git/CSE330-OS/unzip_1726647889/kernel_module/Makefile found
+[log]: Look for source file (my_name.c)
+[log]: - file /home/vboxuser/git/CSE330-OS/unzip_1726647889/kernel_module/my_name.c found
+[log]: Compile the kernel module
+[log]: - Compiled successfully
+[log]: Load the kernel module
+[log]: - Loaded successfully
+[log]: Check dmesg output
+[log]: - Output is correct
+[log]: Unload the kernel module
+[log]: - Kernel module unloaded sucessfully
+[my_name]: Passed with 50 out of 50
+[Total Score]: 50 out of 50
 ```
 
-Note: This does not show complete grade points for the project . Please refer to the project document for more details.
+### [test_syscall.sh](https://github.com/visa-lab/CSE330-OS/blob/project-2/test_syscall.sh)
 
+This script can be used to test the syscall. It will do the following after unzipping the provided zip file:
 
-### [test_zip_contents.sh](https://github.com/visa-lab/CSE330-OS/blob/project-2/test_zip_contents.sh)
-
-This script can be used to ensure your final submission adheres to the directory structure specified in the project document. It will do the following:
-
-1. Unzip your submission into a directory `unzip_<unix timestamp>/`
-2. The script will check for all of the expected directories
-3. The script will check for all of the expected files within each directory
-4. The script will ensure you did not include any binaries or kernel objects
-5. The script will remove the directory it created `unzip_<unix timestamp>/`
-
-Once the script is done running, it will inform you of the correctness of your directory structure by showing how many expected files and directories it was able to locate.
+![image](https://github.com/user-attachments/assets/e58011fa-249f-492d-a2bf-59d538ad1884)
 
 #### Usage and expected output:
 
 Usage:
 ```bash
-./test_zip_contents.sh <path to Project-2-ASUID.zip>
+./test_syscall.sh /path/to/zip/file.zip
 ```
 
 Expected Output:
 ```
-Checking Directory: kernel_module
-  - Directory Found: kernel_module
-     - File Found: kernel_module/my_name.c
-     - File Found: kernel_module/Makefile
-Checking Directory: kernel_syscall
-  - Directory Found: kernel_syscall
-     - File Found: kernel_syscall/my_syscall.c
-     - File Found: kernel_syscall/Makefile
-Checking Directory: userspace
-  - Directory Found: userspace
-     - File Found: userspace/syscall_in_userspace_test.c
-Checking Directory: screenshots
-  - Directory Found: screenshots
-     - File Found: screenshots/syscall_output.png
-Summary --------------------------------------------------------
-Got 4 out of 4 expected directories
-Got 6 out of 6 expected files
+Unzipping to "unzip_1726647980"
+[log]: Look for kernel_syscall directory
+[log]: - directory /home/vboxuser/git/CSE330-OS/unzip_1726647980/kernel_syscall found
+[log]: Look for Makefile
+[log]: - file /home/vboxuser/git/CSE330-OS/unzip_1726647980/kernel_syscall/Makefile found
+[log]: Look for source file (my_syscall.c)
+[log]: - file /home/vboxuser/git/CSE330-OS/unzip_1726647980/kernel_syscall/my_syscall.c found
+[log]: Look for userspace directory
+[log]: - directory /home/vboxuser/git/CSE330-OS/unzip_1726647980/userspace found
+[log]: Look for source file (syscall_in_userspace_test.c)
+[log]: - file /home/vboxuser/git/CSE330-OS/unzip_1726647980/userspace/syscall_in_userspace_test.c found
+[log]: Look for screenshots directory
+[log]: - directory /home/vboxuser/git/CSE330-OS/unzip_1726647980/screenshots found
+[log]: Look for syscall_output screenshot
+[log]: - file /home/vboxuser/git/CSE330-OS/unzip_1726647980/screenshots/syscall_output.* found
+[log]: - Screenshot found
+[my_syscall]: Passed with 50 out of 50
+[Total Score]: 50 out of 50 (this is NOT your final grade)
+NOTE: This script does not check the content of your screenshot.
+      Check grading rubric for details, the grader will inspect
+      the text within the screenshots.
 ```
 
-## Note: 
-- Please do not make any changes in provided test code to pass the test cases.
-- You can use print statements in case you want to debug and understand the logic of the test code.
+Note, the autograder script will need to deduct points from the points given in this script if the screenshot content is incorrect.
+
+### [test_resubmission.sh](https://github.com/visa-lab/CSE330-OS/blob/project-2/test_resubmission.sh)
+
+This script can be used to test the syscall. It will do the following after unzipping the provided zip file:
+
+![image](https://github.com/user-attachments/assets/925cd6fc-fbdb-45af-9fe4-49707b82faf8)
+
+#### Usage and expected output:
+
+Usage:
+```bash
+./test_resubmission.sh /path/to/zip/file.zip
+```
+
+Expected Output:
+```
+NOTE: This script is only meant for testing P1 resubmission
+Unzipping to "unzip_1726685441"
+[log]: Look for Project1 directory
+[log]: - directory /home/vboxuser/git/CSE330-OS/unzip_1726685441/Project1 found
+[log]: Look for uname.png/uname.jpg
+[log]: - file /home/vboxuser/git/CSE330-OS/unzip_1726685441/Project1/uname* found
+[log]: Look for lsb_release.png/lsb_release.jpg
+[log]: - file /home/vboxuser/git/CSE330-OS/unzip_1726685441/Project1/lsb_release* found
+[P1 Resubmit]: Passed
+```
+
+Note, you ONLY need to run this script if you are planning to have your Project 1 regraded. If you are satisfied with your Project 1 grade, you do not need to worry about this script OR include a Project1 directory in your submission.
+
+### [utils.sh](https://github.com/CSE330-OS/GTA-CSE330-Fall2024/blob/main/Project2/testing/utils.sh)
+
+This script is not meant to be run directly, and only contains code that is used in both scripts mentioned above.
+
+### Note
+
+- Please do not make changes in provided test code to pass the test cases.
+- You can use print statements in case you want to debug and understand the logic of the test code (the diagrams may also be useful).
 - Please get in touch with the TAs if you face issues in using the test scripts.
